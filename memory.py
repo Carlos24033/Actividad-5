@@ -57,7 +57,8 @@ def tap(x, y):
         hide[spot] = False
         hide[mark] = False
         state['mark'] = None
-
+    if not any(hide):
+        print("¡Felicidades! Destapaste todos los cuadros.")
 
 def draw():
     """Draw image and tiles."""
