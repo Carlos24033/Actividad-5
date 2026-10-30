@@ -2,23 +2,27 @@
 
 Exercises:
 
-1. Count and print how many taps occur.
-2. Decrease the number of tiles to a 4x4 grid.
-3. Detect when all tiles are revealed.
-4. Center single-digit tile.
-5. Use letters instead of tiles.
+1. Center and scale the digits and/or symbols in the tiles.
+2. Introduce a visual innovation to assist memory (e.g., emojis).
+3. Track and display the number of taps/turns taken.
+4. Detect when all tiles have been revealed.
+5. Center the board on the window or make the window responsive.
 """
 
-from random import *
+from random import shuffle
 from turtle import *
 
-from freegames import path
+# Lista de emojis innovadores para ayudar a la memoria (Punto 2)
+emojis = ['🐶', '🐱', '🦊', '🐼', '🐨', '🦁', '🐯', '🐰', 
+          '🐶', '🐱', '🦊', '🐼', '🐨', '🦁', '🐯', '🐰']
 
-car = path('car.gif')
-tiles = list(range(32)) * 2
+# Estado del juego: tablero de 32 elementos (16 pares)
+# Cada par contiene un número (0-7) y su emoji correspondiente.
+tiles = list(range(8)) * 2
+shuffle(tiles)
+
 state = {'mark': None}
-hide = [True] * 64
-taps = 0
+hide = [True] * 32
 
 def square(x, y):
     """Draw white square with black outline at (x, y)."""
@@ -27,27 +31,26 @@ def square(x, y):
     down()
     color('black', 'white')
     begin_fill()
-    for count in range(4):
-        forward(50)
-        left(90)
+    forward(50)
+    left(90)
+    forward(50)
+    left(90)
+    forward(50)
+    left(90)
+    forward(50)
+    left(90)
     end_fill()
-
 
 def index(x, y):
     """Convert (x, y) coordinates to tiles index."""
     return int((x + 200) // 50 + ((y + 200) // 50) * 8)
 
-
 def xy(count):
-    """Convert tiles count to (x, y) coordinates."""
+    """Convert tiles index to (x, y) coordinates."""
     return (count % 8) * 50 - 200, (count // 8) * 50 - 200
-
 
 def tap(x, y):
     """Update mark and hidden tiles based on tap."""
-    global taps
-    taps += 1
-
     spot = index(x, y)
     mark = state['mark']
 
@@ -57,41 +60,36 @@ def tap(x, y):
         hide[spot] = False
         hide[mark] = False
         state['mark'] = None
-    if not any(hide):
-        print("¡Felicidades! Destapaste todos los cuadros.")
 
 def draw():
     """Draw image and tiles."""
     clear()
     goto(0, 0)
-    shape(car)
+    shape('square')
     stamp()
 
-    for count in range(64):
+    for count in range(32):
         if hide[count]:
             x, y = xy(count)
             square(x, y)
 
     mark = state['mark']
 
-    if mark is not None and hide[mark]:
+    if mark is not None:
         x, y = xy(mark)
         up()
-        goto(x + 2, y)
+        # Modificación 1: Centrar perfectamente los dígitos y emojis en la casilla
+        # Como el cuadro es de 50x50, nos posicionamos en el centro exacto (x + 25, y + 5)
+        goto(x + 25, y + 5)
         color('black')
-        write(tiles[mark], font=('Arial', 30, 'normal'))
-       
-    up()
-    goto(-190, 180)
-    color('red')
-    write('Taps: {}'.format(taps), font=('Arial', 14, 'normal'))
+        
+        # Dibujamos tanto el número como el emoji innovador centrado
+        write(f"{tiles[mark]} {emojis[mark]}", align="center", font=('Arial', 20, 'normal'))
+
     update()
     ontimer(draw, 100)
 
-
-shuffle(tiles)
 setup(420, 420, 370, 0)
-addshape(car)
 hideturtle()
 tracer(False)
 onscreenclick(tap)
